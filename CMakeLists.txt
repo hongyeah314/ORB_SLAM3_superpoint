@@ -1,4 +1,7 @@
-cmake_minimum_required(VERSION 2.8)
+
+set(CMAKE_CUDA_COMPILER "/usr/local/cuda-12.0/bin/nvcc")  # 手动设置nvcc地址
+
+cmake_minimum_required(VERSION 3.9)
 project(ORB_SLAM3)
 
 IF(NOT CMAKE_BUILD_TYPE)
@@ -7,6 +10,7 @@ ENDIF()
 
 MESSAGE("Build type: " ${CMAKE_BUILD_TYPE})
 
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "/usr/local/libtorch")   # 设置libtorch 路径
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -Wall   -O3")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall   -O3")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native")
@@ -32,7 +36,7 @@ LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
 
 # 要保证整个工程的opencv版本一致，包括dbow，源码以及ros相关的
 # 3 4 都可以正常运行
-find_package(OpenCV 3.2)
+find_package(OpenCV 4.2)
    if(NOT OpenCV_FOUND)
       message(FATAL_ERROR "OpenCV > 3.2 not found.")
    endif()
@@ -42,7 +46,13 @@ MESSAGE(${OpenCV_VERSION})
 
 find_package(Eigen3 3.1.0 REQUIRED)
 find_package(Pangolin REQUIRED)
-find_package(realsense2)
+
+#if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+#    set(CMAKE_CUDA_ARCHITECTURES 30 70 75 80 85)
+#endif(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+#
+find_package(Torch REQUIRED)  #寻找libtorch
+find_package(realsense2)  #寻找realsense
 
 include_directories(
 ${PROJECT_SOURCE_DIR}
@@ -56,23 +66,39 @@ ${Pangolin_INCLUDE_DIRS}
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 
 add_library(${PROJECT_NAME} SHARED
+#src/Random.cpp
+#src/Timestamp.cpp
+
 src/System.cc
 src/Tracking.cc
 src/LocalMapping.cc
 src/LoopClosing.cc
+
+#src/SPextractor.cc
+#src/SPmatcher.cc
+#src/SuperPoint.cc
+
 src/ORBextractor.cc
 src/ORBmatcher.cc
+
 src/FrameDrawer.cc
 src/Converter.cc
 src/MapPoint.cc
 src/KeyFrame.cc
+
 src/Atlas.cc
 src/Map.cc
 src/MapDrawer.cc
 src/Optimizer.cc
+
+#src/PnPsolver.cc
+
 src/Frame.cc
 src/KeyFrameDatabase.cc
 src/Sim3Solver.cc
+
+#src/Initializer.cc
+
 src/Viewer.cc
 src/ImuTypes.cc
 src/G2oTypes.cc
@@ -122,6 +148,8 @@ ${OpenCV_LIBS}
 ${EIGEN3_LIBS}
 ${Pangolin_LIBRARIES}
 ${PROJECT_SOURCE_DIR}/Thirdparty/DBoW2/lib/libDBoW2.so
+#${PROJECT_SOURCE_DIR}/Thirdparty/DBoW3/lib/libDBoW3.so
+
 ${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
 -lboost_serialization
 -lcrypto

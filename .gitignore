@@ -64,6 +64,8 @@ Thirdparty/DBoW2/lib/
 Thirdparty/g2o/build/
 Thirdparty/g2o/config.h
 Thirdparty/g2o/lib/
+Thirdparty/DBoW3/build/
+Thirdparty/DBoW3/lib/
 Vocabulary/ORBvoc.txt
 build/
 
@@ -75,3 +77,4 @@ cmake-build-debug/
 *.pyc
 *.osa
 .vscode/settings.json
+
