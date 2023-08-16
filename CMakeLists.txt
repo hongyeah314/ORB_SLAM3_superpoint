@@ -1,7 +1,8 @@
 
 set(CMAKE_CUDA_COMPILER "/usr/local/cuda-12.0/bin/nvcc")  # 手动设置nvcc地址
+set(CAFFE2_USE_CUDNN 1)  # 开启cudnn
 
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.22)
 project(ORB_SLAM3)
 
 IF(NOT CMAKE_BUILD_TYPE)
@@ -47,10 +48,10 @@ MESSAGE(${OpenCV_VERSION})
 find_package(Eigen3 3.1.0 REQUIRED)
 find_package(Pangolin REQUIRED)
 
-#if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
-#    set(CMAKE_CUDA_ARCHITECTURES 30 70 75 80 85)
-#endif(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
-#
+if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+    set(CMAKE_CUDA_ARCHITECTURES 89)
+endif(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+
 find_package(Torch REQUIRED)  #寻找libtorch
 find_package(realsense2)  #寻找realsense
 
